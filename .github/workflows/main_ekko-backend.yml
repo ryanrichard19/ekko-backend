@@ -23,14 +23,12 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          cd backend  # Ensure you are in the correct directory
           npm install
           npm run build --if-present
           npm run test --if-present
 
       - name: Zip artifact for deployment
         run: |
-          cd backend  # Ensure you are in the correct directory
           zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
