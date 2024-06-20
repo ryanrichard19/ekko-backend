@@ -11,13 +11,13 @@ In this option, the backend is deployed using Azure Functions, and the frontend 
 
 #### Architecture Diagrams
 **Context Diagram**
-![Context Diagram](diagrams/option1/context.png)
+![Context Diagram](docs/diagrams/option1/context.png)
 
 **Container Diagram**
-![Container Diagram](diagrams/option1/container.png)
+![Container Diagram](docs/diagrams/option1/container.png)
 
 **Component Diagram**
-![Component Diagram](diagrams/option1/component.png)
+![Component Diagram](docs/diagrams/option1/component.png)
 
 #### Advantages
 - **Scalability**: Azure Functions automatically scale to handle increasing load.
@@ -35,13 +35,13 @@ In this option, both the backend and frontend are deployed using Azure Web Apps.
 
 #### Architecture Diagrams
 **Context Diagram**
-![Context Diagram](diagrams/option2/context.png)
+![Context Diagram](docs/diagrams/option2/context.png)
 
 **Container Diagram**
-![Container Diagram](diagrams/option2/container.png)
+![Container Diagram](docs/diagrams/option2/container.png)
 
 **Component Diagram**
-![Component Diagram](diagrams/option2/component.png)
+![Component Diagram](docs/diagrams/option2/component.png)
 
 #### Advantages
 - **Managed Environment**: Simplifies deployment and management.
@@ -58,13 +58,13 @@ In this option, the backend and frontend are containerized and deployed using Az
 
 #### Architecture Diagrams
 **Context Diagram**
-![Context Diagram](diagrams/option3/context.png)
+![Context Diagram](docs/diagrams/option3/context.png)
 
 **Container Diagram**
-![Container Diagram](diagrams/option3/container.png)
+![Container Diagram](docs/diagrams/option3/container.png)
 
 **Component Diagram**
-![Component Diagram](diagrams/option3/component.png)
+![Component Diagram](docs/diagrams/option3/component.png)
 
 #### Advantages
 - **High Scalability**: Kubernetes provides advanced scaling capabilities.
@@ -120,3 +120,7 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Documentation
+
+For more detailed information about the database schema, entities, relationships, and key features, please refer to the [Database Schema Documentation](docs/database-schema.md).
