@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(admin, "Admin")
+Person(user, "User")
+
+Container_Boundary(c1, "Ekko System") {
+    Container(backend, "Backend (Azure Functions)", "Node.js", "Event-driven and highly scalable")
+    Container(frontend, "Frontend (Azure Web App)", "React", "Scalable web hosting with minimal management")
+    ContainerDb(database, "Database", "PostgreSQL", "Managed by Azure Database for PostgreSQL, scalable")
+}
+
+admin -> backend: "Manages system"
+user -> frontend: "Uses the system"
+frontend -> backend: "Requests data"
+backend -> database: "Reads/Writes data"
+
+@enduml

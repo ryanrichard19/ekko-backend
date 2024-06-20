@@ -1,0 +1,16 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(c1, "Backend (Azure Web App)") {
+    Component(api, "API", "Node.js", "Handles HTTP requests")
+    Component(service, "Service Layer", "Node.js", "Contains business logic, managed environment")
+    Component(repository, "Repository", "Node.js", "Handles data access")
+}
+
+ContainerDb(database, "Database", "PostgreSQL", "Managed by Azure Database for PostgreSQL, scalable")
+
+api -> service: "Processes requests"
+service -> repository: "Accesses data"
+repository -> database: "Reads/Writes data"
+
+@enduml

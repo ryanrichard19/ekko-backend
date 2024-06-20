@@ -1,0 +1,16 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(admin, "Admin")
+Person(user, "User")
+
+System_Boundary(c1, "Ekko System") {
+    System(backend, "Backend (Azure Functions)", "Handles business logic and data processing, event-driven and highly scalable")
+    System(frontend, "Frontend (Azure Web App)", "User interface for interacting with the system, easy to deploy and manage")
+}
+
+admin -> backend: "Manages system"
+user -> frontend: "Uses the system"
+frontend -> backend: "Requests data"
+
+@enduml
