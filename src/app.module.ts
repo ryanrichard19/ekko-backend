@@ -1,11 +1,19 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
-import { User } from './user/user.entity';
 import { UserModule } from './user/user.module';
+import { RoleModule } from './role/role.module';
+import { UserRoleModule } from './user-role/user-role.module';
+import { User } from './user/user.entity';
+import { Role } from './role/role.entity';
+import { UserRole } from './user-role/user-role.entity';
+import { AuthModule } from './auth/auth.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from 'config/winston.config';
+import { LoggingMiddleware } from './middleware/logging.middleware';
 
 @Module({
   imports: [
@@ -27,15 +35,23 @@ import { UserModule } from './user/user.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
         ssl: true,
       }),
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Role, UserRole]),
+    WinstonModule.forRoot(winstonConfig),
     HealthModule,
     UserModule,
+    RoleModule,
+    UserRoleModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}

@@ -10,6 +10,10 @@ export class AppService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  getHello(): string {
+    return 'Hello World!';
+  }
+
   async checkDatabaseConnection(): Promise<string> {
     try {
       await this.userRepository.query('SELECT 1');
