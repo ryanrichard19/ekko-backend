@@ -17,7 +17,7 @@ export class AppService {
   async checkDatabaseConnection(): Promise<string> {
     try {
       await this.userRepository.query('SELECT 1');
-      return 'Database connection is healthy';
+      return 'Database connection is healthy.';
     } catch (error) {
       return `Database connection error: ${error.message}`;
     }

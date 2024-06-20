@@ -6,6 +6,8 @@ import { Role } from '../role/role.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './create-user.dto';
 import { UserRole } from 'src/user-role/user-role.entity';
+import { UserResponseDto } from './user-response.dto';
+import { UpdateUserDto } from './update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -19,19 +21,26 @@ export class UserService {
     private dataSource: DataSource,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<UserResponseDto[]> {
+    const users = await this.userRepository.find({ relations: ['userRoles', 'userRoles.role'] });
+    return users.map(user => this.toUserResponseDto(user));
   }
 
-  findOne(id: number): Promise<User> {
-    return this.userRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<UserResponseDto> {
+    const user = await this.userRepository.findOne({ where: { id }, relations: ['userRoles', 'userRoles.role'] });
+    return this.toUserResponseDto(user);
   }
 
-  findByEmail(email: string): Promise<User> {
-    return this.userRepository.findOne({ where: { email } });
+  async findByEmail(email: string): Promise<UserResponseDto> {
+    const user = await this.userRepository.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
+    return this.toUserResponseDto(user);
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async findEntityByEmail(email: string): Promise<User> {
+    return this.userRepository.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -56,7 +65,7 @@ export class UserService {
         }
       }
       await queryRunner.commitTransaction();
-      return savedUser;
+      return this.toUserResponseDto(savedUser);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -65,12 +74,21 @@ export class UserService {
     }
   }
 
-  async update(id: number, user: User): Promise<User> {
-    await this.userRepository.update(id, user);
-    return this.userRepository.findOne({ where: { id } });
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+    await this.userRepository.update(id, updateUserDto);
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+   private toUserResponseDto(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      roles: user.userRoles ? user.userRoles.map(userRole => userRole.role) : [],
+    };
   }
 }

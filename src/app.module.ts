@@ -12,8 +12,8 @@ import { Role } from './role/role.entity';
 import { UserRole } from './user-role/user-role.entity';
 import { AuthModule } from './auth/auth.module';
 import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from 'config/winston.config';
 import { LoggingMiddleware } from './middleware/logging.middleware';
+import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -40,7 +40,16 @@ import { LoggingMiddleware } from './middleware/logging.middleware';
       }),
     }),
     TypeOrmModule.forFeature([User, Role, UserRole]),
-    WinstonModule.forRoot(winstonConfig),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.simple(),
+          ),
+        }),
+      ],
+    }),
     HealthModule,
     UserModule,
     RoleModule,

@@ -9,9 +9,4 @@ export class AppController {
   async getDatabaseHealth(): Promise<string> {
     return this.appService.checkDatabaseConnection();
   }
-
-  @Get('/')
-  getHello(): string {
-    return 'Hello World!';
-  }
 }
