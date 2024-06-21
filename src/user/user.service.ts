@@ -22,22 +22,33 @@ export class UserService {
   ) {}
 
   async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.find({ relations: ['userRoles', 'userRoles.role'] });
-    return users.map(user => this.toUserResponseDto(user));
+    const users = await this.userRepository.find({
+      relations: ['userRoles', 'userRoles.role'],
+    });
+    return users.map((user) => this.toUserResponseDto(user));
   }
 
   async findOne(id: number): Promise<UserResponseDto> {
-    const user = await this.userRepository.findOne({ where: { id }, relations: ['userRoles', 'userRoles.role'] });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['userRoles', 'userRoles.role'],
+    });
     return this.toUserResponseDto(user);
   }
 
   async findByEmail(email: string): Promise<UserResponseDto> {
-    const user = await this.userRepository.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['userRoles', 'userRoles.role'],
+    });
     return this.toUserResponseDto(user);
   }
 
   async findEntityByEmail(email: string): Promise<User> {
-    return this.userRepository.findOne({ where: { email }, relations: ['userRoles', 'userRoles.role'] });
+    return this.userRepository.findOne({
+      where: { email },
+      relations: ['userRoles', 'userRoles.role'],
+    });
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -74,7 +85,10 @@ export class UserService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
@@ -83,12 +97,14 @@ export class UserService {
     await this.userRepository.delete(id);
   }
 
-   private toUserResponseDto(user: User): UserResponseDto {
+  private toUserResponseDto(user: User): UserResponseDto {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
-      roles: user.userRoles ? user.userRoles.map(userRole => userRole.role) : [],
+      roles: user.userRoles
+        ? user.userRoles.map((userRole) => userRole.role)
+        : [],
     };
   }
 }

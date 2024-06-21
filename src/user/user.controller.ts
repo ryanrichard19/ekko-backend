@@ -16,6 +16,7 @@ import { CreateUserDto } from './create-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserResponseDto } from './user-response.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -25,7 +26,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: number): Promise<UserResponseDto> {
     return this.userService.findOne(id);
@@ -38,7 +38,10 @@ export class UserController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() user: User): Promise<UserResponseDto> {
+  update(
+    @Param('id') id: number,
+    @Body() user: User,
+  ): Promise<UserResponseDto> {
     return this.userService.update(id, user);
   }
 

@@ -5,33 +5,35 @@ import {
   Body,
   Param,
   Delete,
-  Put,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { Role } from './role.entity';
+import { CreateRoleDto } from './create-role.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RoleResponseDto } from './role-response.dto';
+import { RoleDetailResponseDto } from './role-detail-response.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @Get()
-  findAll(): Promise<Role[]> {
+  findAll(): Promise<RoleResponseDto[]> {
     return this.roleService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Role> {
-    return this.roleService.findOne(id);
+  findOne(@Param('id') id: number): Promise<RoleDetailResponseDto> {
+    return this.roleService.findOneWithHierarchy(id);
   }
 
   @Post()
-  create(@Body() role: Role): Promise<Role> {
-    return this.roleService.create(role);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: number, @Body() role: Role): Promise<Role> {
-    return this.roleService.update(id, role);
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  create(@Body() createRoleDto: CreateRoleDto): Promise<RoleResponseDto> {
+    return this.roleService.create(createRoleDto);
   }
 
   @Delete(':id')
