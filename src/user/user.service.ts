@@ -21,10 +21,67 @@ export class UserService {
     private dataSource: DataSource,
   ) {}
 
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.find({
+  private async getRolesAtOrBelow(role: Role): Promise<Role[]> {
+    const getAllChildren = async (role: Role): Promise<Role[]> => {
+      const children = await this.roleRepository.find({
+        where: { parent: role },
+      });
+      return [
+        role,
+        ...(await Promise.all(
+          children.map((child) => getAllChildren(child)),
+        ).then((results) => results.flat())),
+      ];
+    };
+
+    return getAllChildren(role);
+  }
+
+  async findAll(reqUser: User): Promise<UserResponseDto[]> {
+    console.debug('Reached findAll method');
+    console.debug(`Current User: ${JSON.stringify(reqUser)}`);
+    const currentUser = await this.userRepository.findOne({
+      where: { id: reqUser.id },
       relations: ['userRoles', 'userRoles.role'],
     });
+    // Ensure userRoles is initialized
+    if (!currentUser.userRoles || currentUser.userRoles.length === 0) {
+      console.error('User has no roles assigned');
+      return [];
+    }
+
+    const currentUserRoles = currentUser.userRoles.map((ur) => ur.role);
+    console.debug(`Current User Roles: ${JSON.stringify(currentUserRoles)}`);
+
+    const rolesAtOrBelow = await Promise.all(
+      currentUserRoles.map((role) => this.getRolesAtOrBelow(role)),
+    );
+
+    console.debug(
+      `Roles at or below current user roles: ${JSON.stringify(rolesAtOrBelow)}`,
+    );
+
+    const roleIds = rolesAtOrBelow.flat().map((role) => role.id);
+
+    if (!roleIds || roleIds.length === 0) {
+      console.error('No roles found at or below current user roles');
+      return [];
+    }
+
+    console.debug(`Role IDs: ${JSON.stringify(roleIds)}`);
+
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role')
+      .where('userRoles.roleId IN (:...roleIds)', { roleIds })
+      .getMany();
+
+    if (!users || users.length === 0) {
+      console.debug('No users found with the same role or below');
+      return [];
+    }
+
     return users.map((user) => this.toUserResponseDto(user));
   }
 

@@ -9,6 +9,7 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
@@ -22,8 +23,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAll(): Promise<UserResponseDto[]> {
-    return this.userService.findAll();
+  findAll(@Req() req: any): Promise<UserResponseDto[]> {
+    const currentUser = req.user as User;
+    console.log('reached here');
+    console.log(currentUser);
+    return this.userService.findAll(currentUser);
   }
 
   @Get(':id')
